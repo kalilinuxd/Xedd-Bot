@@ -1,7 +1,7 @@
 /** @author Jaymar Xedd */
 
 /**
- * @type {Map<string, number>}
+ * @type {Map<string XD, number>}
  */
 const cooldownMap = new Map();
 

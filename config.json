@@ -1,0 +1,16 @@
+{
+  "prefix": "+",
+  "admins": [
+    "100028670289781"
+  ],
+  "botName": "Xedd Bot",
+  "language": "en",
+  "selfListen": false,
+  "threadBlacklist": [],
+  "permissionGroups": {
+    "moderators": [],
+    "vip": [
+      "100028670289781"
+    ]
+  }
+}

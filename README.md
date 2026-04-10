@@ -99,9 +99,9 @@ module.exports = {
 
 <table>
   <tr>
-    <td align="center"><b>Chipp AI — Photo Description</b></td>
-    <td align="center"><b>Help & ChippAI Text</b></td>
-    <td align="center"><b>AI Cooldown & Image Generation</b></td>
+    <td align="center"><b>Sample Screenshot-1</b></td>
+    <td align="center"><b>Sample Screenshot-2</b></td>
+    <td align="center"><b>Sample Screenshot-3</b></td>
   </tr>
   <tr>
     <td><img src="screenshots/chipp-photo.jpeg" width="250"/></td>

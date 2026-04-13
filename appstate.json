@@ -1,1 +1,91 @@
-[]
+[
+    {
+        "domain": ".facebook.com",
+        "secure": true,
+        "expirationDate": 1776205128,
+        "hostOnly": false,
+        "name": "vpd",
+        "httpOnly": false,
+        "session": false,
+        "storeId": null,
+        "value": "v1%3B500x375x2",
+        "path": "/",
+        "sameSite": "explicit"
+    },
+    {
+        "domain": ".facebook.com",
+        "secure": true,
+        "expirationDate": 1776205128,
+        "hostOnly": false,
+        "name": "fbl_st",
+        "httpOnly": false,
+        "session": false,
+        "storeId": null,
+        "value": "100736163%3BT%3A29601978",
+        "path": "/",
+        "sameSite": "explicit"
+    },
+    {
+        "domain": ".facebook.com",
+        "secure": true,
+        "expirationDate": 1776723526,
+        "hostOnly": false,
+        "name": "locale",
+        "httpOnly": false,
+        "session": false,
+        "storeId": null,
+        "value": "ar_AR",
+        "path": "/",
+        "sameSite": "explicit"
+    },
+    {
+        "domain": ".facebook.com",
+        "secure": true,
+        "hostOnly": false,
+        "name": "m_pixel_ratio",
+        "httpOnly": false,
+        "session": true,
+        "storeId": null,
+        "value": "2",
+        "path": "/",
+        "sameSite": "explicit"
+    },
+    {
+        "domain": ".facebook.com",
+        "secure": true,
+        "expirationDate": 1807654722,
+        "hostOnly": false,
+        "name": "c_user",
+        "httpOnly": false,
+        "session": false,
+        "storeId": null,
+        "value": "61583526360645",
+        "path": "/",
+        "sameSite": "explicit"
+    },
+    {
+        "domain": ".facebook.com",
+        "secure": true,
+        "hostOnly": false,
+        "name": "wd",
+        "httpOnly": false,
+        "session": true,
+        "storeId": null,
+        "value": "375x667",
+        "path": "/",
+        "sameSite": "explicit"
+    },
+    {
+        "domain": ".facebook.com",
+        "secure": true,
+        "expirationDate": 1776205127,
+        "hostOnly": false,
+        "name": "wl_cbv",
+        "httpOnly": false,
+        "session": false,
+        "storeId": null,
+        "value": "v2%3Bclient_version%3A3142%3Btimestamp%3A1776118726",
+        "path": "/",
+        "sameSite": "explicit"
+    }
+]

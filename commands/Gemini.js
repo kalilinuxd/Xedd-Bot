@@ -1,118 +1,99 @@
+
 const axios = require("axios");
 
-// مفتاح API (بنفس صيغتك)
+// مفتاح Gemini بصيغة AQ (الخاص بك)
 const GEMINI_API_KEY = "AQ.Ab8RN6I3RgZ9TGWPvGFktaTFB4e4lsmuwyrOX6PnwkCJKX_xTQ";
 
 module.exports = {
   name: "gemini",
-  aliases: ["ai", "ask"],
+  aliases: ["ai2", "جيمني"],
   author: "أنت",
   category: "ai",
   cooldowns: 5,
-  description: "اسأل Gemini AI مع دعم تحليل الصور",
-  usage: "/gemini <سؤالك> (أرسل صورة أو رد على صورة أو رابط صورة)",
+  description: "Gemini AI - محاولة إصلاح مشكلة المصادقة",
+  usage: "/gemini <سؤالك>",
   role: 0,
   async onCall(api, event, args) {
     const question = args.join(" ");
-
-    if (!question && !event.attachments?.length && !event.messageReply) {
-      return api.sendMessage("📝 الرجاء كتابة سؤال أو إرفاق صورة أو الرد على صورة", event.threadID);
+    
+    if (!question) {
+      return api.sendMessage("📝 مثال: /gemini اشرح الذكاء الاصطناعي", event.threadID);
     }
 
-    // استخراج رابط الصورة من المرفقات أو النص أو الرد
-    let imageUrl = null;
-    if (event.attachments?.[0]?.type === "photo" && event.attachments[0].url) {
-      imageUrl = event.attachments[0].url;
-    } else if (event.attachments?.[0]?.type === "sticker") {
-      imageUrl = event.attachments[0].url;
-    } else if (question) {
-      const match = question.match(/(https?:\/\/[^\s]+\.(jpg|jpeg|png|webp|gif))/i);
-      if (match) imageUrl = match[0];
-    } else if (event.messageReply?.attachments?.[0]?.url) {
-      imageUrl = event.messageReply.attachments[0].url;
-    }
-
-    api.sendMessage("🤖 جارٍ تحليل طلبك مع Gemini...", event.threadID, async (err, msgInfo) => {
+    api.sendMessage("🔄 جارٍ الاتصال بـ Gemini...", event.threadID, async (err, msgInfo) => {
       try {
-        let requestBody;
+        // محاولة 1: استخدام API endpoint مختلف
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent`;
+        
+        const requestBody = {
+          contents: [
+            {
+              parts: [
+                {
+                  text: question
+                }
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 800
+          }
+        };
 
-        if (imageUrl) {
-          // تحميل الصورة وتحويلها إلى base64
-          const imageResp = await axios.get(imageUrl, { responseType: "arraybuffer" });
-          const base64Image = Buffer.from(imageResp.data).toString("base64");
-          const mimeType = imageResp.headers["content-type"];
+        // تجربة طريقة مصادقة مختلفة
+        const response = await axios({
+          method: "post",
+          url: url,
+          params: {
+            key: GEMINI_API_KEY  // استخدام query parameter بدلاً من header
+          },
+          data: requestBody,
+          headers: {
+            "Content-Type": "application/json"
+          },
+          timeout: 20000
+        });
 
-          // بناء الطلب مع الصورة (نفس صيغة curl ولكن مع inlineData)
-          requestBody = {
-            contents: [
-              {
-                parts: [
-                  { text: question || "ماذا ترى في هذه الصورة؟ صفها بالتفصيل." },
-                  {
-                    inlineData: {
-                      mimeType: mimeType,
-                      data: base64Image
-                    }
-                  }
-                ]
-              }
-            ]
-          };
-        } else {
-          // طلب نص فقط (نفس صيغة curl بالضبط)
-          requestBody = {
-            contents: [
-              {
-                parts: [
-                  {
-                    text: question || "مرحباً، كيف يمكنني مساعدتك؟"
-                  }
-                ]
-              }
-            ]
-          };
+        const reply = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
+        
+        if (!reply) {
+          throw new Error("لم يتم العثور على رد من Gemini");
         }
 
-        // نفس طريقة curl بالضبط
-        const response = await axios.post(
-          "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent",
-          requestBody,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "X-goog-api-key": GEMINI_API_KEY
-            }
-          }
-        );
-
-        // استخراج النص من الرد
-        const reply = response.data.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ لا يوجد رد من Gemini";
-
-        // حذف رسالة "جارٍ التحليل"
-        if (msgInfo) api.unsendMessage(msgInfo.messageID);
-
-        // تقسيم الرد إذا كان طويلاً
+        if (msgInfo) await api.unsendMessage(msgInfo.messageID);
+        
         if (reply.length > 2000) {
           const chunks = reply.match(/[\s\S]{1,2000}/g) || [];
           for (const chunk of chunks) {
             await api.sendMessage(chunk, event.threadID);
           }
         } else {
-          api.sendMessage(reply, event.threadID);
+          await api.sendMessage(reply, event.threadID);
         }
-
+        
       } catch (error) {
-        console.error("Gemini error:", error.response?.data || error.message);
+        console.error("Gemini Error Details:", {
+          status: error.response?.status,
+          data: error.response?.data,
+          message: error.message
+        });
         
-        let errorMsg = "❌ حدث خطأ: ";
-        if (error.response?.data?.error?.message) {
-          errorMsg += error.response.data.error.message;
+        let errorMessage = "❌ فشل الاتصال بـ Gemini.\n\n";
+        
+        if (error.response?.status === 401) {
+          errorMessage += "🔑 مفتاح API غير صالح أو منتهي الصلاحية.\n";
+          errorMessage += "📌 الحل: احصل على مفتاح جديد من:\n";
+          errorMessage += "https://aistudio.google.com/app/apikey\n\n";
+          errorMessage += "💡 نصيحة: استخدم /deepseek بدلاً من ذلك (يعمل حالياً)";
+        } else if (error.response?.data?.error?.message) {
+          errorMessage += `📛 ${error.response.data.error.message}`;
         } else {
-          errorMsg += error.message || "غير معروف";
+          errorMessage += `⚠️ ${error.message || "خطأ غير معروف"}`;
         }
         
-        api.sendMessage(errorMsg, event.threadID);
-        if (msgInfo) api.unsendMessage(msgInfo.messageID);
+        await api.sendMessage(errorMessage, event.threadID);
+        if (msgInfo) await api.unsendMessage(msgInfo.messageID);
       }
     });
   }
